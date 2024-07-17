@@ -21,7 +21,14 @@ jobs:
         run: |
           echo "Login starts"
           docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
-          echo "Login ends"
+          echo "Login ended"
+      - name: Building the docker image
+        run: |
+          echo $DOCKER_USER 
+          docker build . --file Dockerfile --tag $DOCKER_USER/docker-actions:0.0.2
+      - name: Pushing Docker Image
+        run: |
+          docker push $DOCKER_USER/docker-actions:0.0.2
 
       # - name: Build the Docker image
       #   run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
