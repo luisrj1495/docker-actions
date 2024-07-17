@@ -24,7 +24,7 @@ jobs:
           major_pattern: 'major:'
           minor_pattern: 'minor:'
           version_format: '${major}.${minor}.${patch}-${increment}'
-          bump_each_commit: false
+          bump_each_commit: true
 
       - name: Login on docker HUB
         env:
