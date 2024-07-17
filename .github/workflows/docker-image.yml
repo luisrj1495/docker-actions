@@ -9,28 +9,43 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env: 
+    env:
       DOCKER_USER: ${{ secrets.DOCKER_USER }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      - name: Git Semantic Version
+        uses: paulhatch/semantic-version@v5.3.0
+        id: version
+        with:
+          namespace: app
+          major_pattern: 'major:'
+          minor_pattern: 'minor:'
+          version_format: '${major}.${minor}.${patch}-${increment}'
+          bump_each_commit: false
+
       - name: Login on docker HUB
         env:
           DOCKER_USER: ${{ secrets.DOCKER_USER }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+          NEW_VERSION: ${{ steps.version.outputs.version }}
         run: |
-          echo "Login starts"
+          echo "Login starts on version $NEW_VERSION!!"
           docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
           echo "Login ended"
-      - name: Building the docker image
-        run: |
-          echo $DOCKER_USER 
-          docker build . --file Dockerfile --tag $DOCKER_USER/docker-actions:0.0.2
-      - name: Pushing Docker Image
-        run: |
-          docker push $DOCKER_USER/docker-actions:0.0.2
+      # - name: Building the docker image
+      #   env:
+      #     NEW_VERSION: ${{ steps.version.outputs.version }}
+      #   run: |
+      #     echo $DOCKER_USER
+      #     docker build . --file Dockerfile --tag $DOCKER_USER/docker-actions:$NEW_VERSION
+      #     docker build . --file Dockerfile --tag $DOCKER_USER/docker-actions:latest
 
-      # - name: Build the Docker image
-      #   run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+      # - name: Pushing Docker Image
+      #   env:
+      #     NEW_VERSION: ${{ steps.version.outputs.version }}
+      #   run: |
+      #     docker push $DOCKER_USER/docker-actions:$NEW_VERSION
+      #     docker push $DOCKER_USER/docker-actions:latest
