@@ -23,7 +23,7 @@ jobs:
           namespace: app
           major_pattern: 'major:'
           minor_pattern: 'minor:'
-          version_format: '${major}.${minor}.${patch}-${increment}'
+          version_format: '${major}.${minor}.${patch}'
           bump_each_commit: true
 
       - name: Login on docker HUB
@@ -35,17 +35,17 @@ jobs:
           echo "Login starts on version $NEW_VERSION!!"
           docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
           echo "Login ended"
-      # - name: Building the docker image
-      #   env:
-      #     NEW_VERSION: ${{ steps.version.outputs.version }}
-      #   run: |
-      #     echo $DOCKER_USER
-      #     docker build . --file Dockerfile --tag $DOCKER_USER/docker-actions:$NEW_VERSION
-      #     docker build . --file Dockerfile --tag $DOCKER_USER/docker-actions:latest
+      - name: Building the docker image
+        env:
+          NEW_VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          echo $DOCKER_USER
+          docker build . --file Dockerfile --tag $DOCKER_USER/docker-actions:$NEW_VERSION
+          docker build . --file Dockerfile --tag $DOCKER_USER/docker-actions:latest
 
-      # - name: Pushing Docker Image
-      #   env:
-      #     NEW_VERSION: ${{ steps.version.outputs.version }}
-      #   run: |
-      #     docker push $DOCKER_USER/docker-actions:$NEW_VERSION
-      #     docker push $DOCKER_USER/docker-actions:latest
+      - name: Pushing Docker Image
+        env:
+          NEW_VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          docker push $DOCKER_USER/docker-actions:$NEW_VERSION
+          docker push $DOCKER_USER/docker-actions:latest
